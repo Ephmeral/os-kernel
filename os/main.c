@@ -1,5 +1,8 @@
 #include "console.h"
 #include "defs.h"
+#include "trap.h"
+#include "loader.h"
+#include "timer.h"
 
 extern char s_text[];
 extern char e_text[];
@@ -10,10 +13,6 @@ extern char e_data[];
 extern char s_bss[];
 extern char e_bss[];
 
-int threadid() {
-    return 0;
-}
-
 void clean_bss() {
     char *p;
     for (p = s_bss; p < e_bss; ++p) {
@@ -22,10 +21,6 @@ void clean_bss() {
 }
 
 void main() {
-    clean_bss();
-    console_init();
-    printf("\n");
-    printf("hello wrold!\n");
     // errorf("stext: %p", s_text);
     // warnf("etext: %p", e_text);
     // infof("sroda: %p", s_rodata);
@@ -34,8 +29,12 @@ void main() {
     // infof("edata: %p", e_data);
     // warnf("sbss : %p", s_bss);
     // errorf("ebss : %p", e_bss);
-    trap_init();
-    loader_init();
-    run_next_app();
-    panic("ALL DONE");
+	clean_bss();
+	proc_init();
+	loader_init();
+	trap_init();
+	timer_init();
+	run_all_app();
+	infof("start scheduler!");
+	scheduler();
 }
